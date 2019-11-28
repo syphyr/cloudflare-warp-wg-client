@@ -5,9 +5,12 @@ chmod 700 ~/.wgcf
 prv=~/.wgcf/private.key
 usr=~/.wgcf/identity.cfg
 
-tun="wg09"
-ip link delete ${tun}
-ip link add dev "${tun}" type wireguard
+tun="vpn1"
+vpn="$(ifconfig -a | grep ${tun} | grep RUNNING)"
+if [ ! "$vpn" == "" ]; then
+    sudo ip link delete ${tun}
+fi
+sudo ip link add dev "${tun}" type wireguard
 echo "Will use interface: ${tun}"
 
 if [ -e "${usr}" ]; then
