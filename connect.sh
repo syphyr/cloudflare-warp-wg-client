@@ -48,7 +48,7 @@ fi
 end=${cfg[1]%:*}
 echo "${end}"
 sudo route -n delete "${end}" 2>/dev/null || true
-sudo route -n add "${end}" gw 192.168.0.1 # Need to determine gateway in script.
+sudo route -n add "${end}" gw 192.168.1.254 # Need to determine gateway in script.
 
 sudo ifconfig "${tun}" inet "${cfg[2]}" "${cfg[2]}" netmask 255.255.255.255
 sudo wg set "${tun}" private-key "${prv}" peer "${cfg[0]}" endpoint "${cfg[1]}" allowed-ips 0.0.0.0/0
