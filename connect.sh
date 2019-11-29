@@ -14,14 +14,18 @@ sudo ip link add dev "${tun}" type wireguard
 echo "Will use interface: ${tun}"
 
 if [ -e "${usr}" ]; then
-    echo "Identity already exists!"
+    echo "Using existing Cloudflare Warp identity."
 
     token=($(cat "${usr}"))
     test "${#token[@]}" -eq 2
 
     reg=$(curl -s -H 'user-agent:' -H 'content-type: application/json' -H 'authorization: Bearer '"${token[1]}"'' -X "GET" https://api.cloudflareclient.com/v0i1909051800/reg/${token[0]})
     cfg=($(echo $reg | jq -r '.result.config|(.peers[0]|.public_key+" "+.endpoint.v4)+" "+.interface.addresses.v4'))
-    echo $reg
+    #echo $reg
+    test "${#cfg[@]}" -eq 3
+    echo "Peer: ${cfg[0]}"
+    echo "Endpoint: ${cfg[1]}"
+    echo "Interface address: ${cfg[2]}"
 else
     pub=$({ cat "${prv}" 2>/dev/null || wg genkey | tee "${prv}"; } | wg pubkey)
     test -n "${pub}"
@@ -46,7 +50,7 @@ else
 fi
 
 end=${cfg[1]%:*}
-echo "${end}"
+#echo "${end}"
 sudo route -n delete "${end}" 2>/dev/null || true
 sudo route -n add "${end}" gw 192.168.1.254 # Need to determine gateway in script.
 
